@@ -1,0 +1,8 @@
+[user]
+	name = jim winstead
+	email = jimw@trainedmonkey.com
+[alias]
+	ci = commit
+	st = status -s
+[init]
+	defaultBranch = main
