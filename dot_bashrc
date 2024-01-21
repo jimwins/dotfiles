@@ -1,0 +1,56 @@
+# just bail out early for non-interactive shell
+if [[ $- != *i* ]] ; then
+	return
+fi
+
+if [ -x /usr/bin/vim ]; then
+  export EDITOR=/usr/bin/vim
+fi
+
+prompt() {
+  case $1 in
+    on)
+      color_root=$(tput setaf 1)
+      color_user=$(tput setaf 2)
+      color_sudo=$(tput setaf 3)
+      color_reset=$(tput sgr0)
+
+      if (( EUID == 0 )); then
+        color=$color_root
+      elif [[ $SUDO_USER ]]; then
+        color=$color_sudo
+      else
+        color=$color_user
+      fi
+#      PROMPT_COMMAND="run_on_prompt_command"
+      PS1="\[$color\]\u@\h\[$color_reset\]:\w \$ "
+      ;;
+
+    off)
+#      unset -v PROMPT_COMMAND
+      PS1='$ '
+      PS2='> '
+      PS3='? '
+      PS4='+ '
+      ;;
+  esac
+}
+
+prompt on
+
+prepend_to_path () {
+  if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+    PATH="$1${PATH:+":$PATH"}"
+  fi
+}
+
+prepend_to_path $HOME/go/bin
+prepend_to_path $HOME/.local/bin
+prepend_to_path $HOME/bin
+
+alias ls='ls --color=auto'
+eval $(dircolors)
+
+alias grep='grep --color=auto'
+
+function cj { curl -s -H "Accept: application/json" "$@" | jq -r '.'; }
