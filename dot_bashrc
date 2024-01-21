@@ -49,7 +49,9 @@ prepend_to_path $HOME/.local/bin
 prepend_to_path $HOME/bin
 
 alias ls='ls --color=auto'
-eval $(dircolors)
+if which -s dircolors; then
+  eval $(dircolors)
+fi
 
 alias grep='grep --color=auto'
 
