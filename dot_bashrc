@@ -56,3 +56,12 @@ fi
 alias grep='grep --color=auto'
 
 function cj { curl -s -H "Accept: application/json" "$@" | jq -r '.'; }
+
+if which wezterm > /dev/null 2>&1; then
+  eval "$(wezterm shell-completion --shell=bash)"
+fi
+
+if which atuin > /dev/null 2>&1; then
+  [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+  eval "$(atuin init bash)"
+fi
