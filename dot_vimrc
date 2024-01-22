@@ -1,0 +1,43 @@
+" put .swp files in /var/tmp to avoid dropbox syncing
+set directory=/var/tmp
+
+" make backspace more powerful
+set backspace=indent,eol,start
+
+" use spaces for tabs
+set expandtab
+
+" tabs are 8 spaces wide, anything else is madness
+set tabstop=8
+
+" but i prefer 2-space indents
+set shiftwidth=2
+set softtabstop=2
+
+" max text width on insert
+set tw=78
+
+" formatting options: c=auto-wrap comments, q= allow gq, r=auto insert comment
+" leader, o=insert after 'o', 1=don't break after 1-letter word
+set formatoptions=cqro1
+
+" turn on smart indenting
+set smartindent
+
+" always want the status line
+set laststatus=2
+
+" look for modelines
+set modeline
+
+" search highlighting is too busy for me
+set nohlsearch
+
+" highlight trailing spaces as errors
+let c_space_errors=1
+
+" turn on syntax highlighting and add some config
+syntax on
+syn sync minlines=300
+autocmd BufEnter * :syntax sync fromstart
+autocmd BufNewFile,BufRead *.twig set syntax=htmldjango
