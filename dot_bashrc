@@ -74,6 +74,7 @@ fi
 if which atuin > /dev/null 2>&1; then
   [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
   eval "$(atuin init bash)"
+  eval "$(atuin gen-completions --shell bash)"
 fi
 
 if which chezmoi > /dev/null 2>&1; then
