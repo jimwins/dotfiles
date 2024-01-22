@@ -41,3 +41,10 @@ syntax on
 syn sync minlines=300
 autocmd BufEnter * :syntax sync fromstart
 autocmd BufNewFile,BufRead *.twig set syntax=htmldjango
+
+" configure lightline
+set noshowmode
+set background=dark
+let g:lightline = {
+      \ 'colorscheme': 'solarized',
+      \ }
