@@ -4,3 +4,7 @@
     exact = true
     stripComponents = 1
     refreshPeriod = "168h"
+[".bash-preexec.sh"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh"
+    refreshPeriod = "168h"
