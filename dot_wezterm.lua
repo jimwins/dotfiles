@@ -25,4 +25,7 @@ return {
   window_background_opacity = 1.0,
   initial_rows = 33,
   initial_cols = 100,
+  keys = {
+    { key = 't', mods = 'SUPER|SHIFT', action = wezterm.action.ShowLauncher },
+  },
 }
