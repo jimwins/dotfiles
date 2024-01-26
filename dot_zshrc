@@ -1,0 +1,100 @@
+# vim as default, if available
+if [ -x /usr/bin/vim ]; then
+  export EDITOR=/usr/bin/vim
+fi
+
+# configure regular history (in addition to atuin, if it is present)
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+
+# add some things to path if they exist, moving it to front if it does
+prepend_to_path () {
+  if [ -d "$1" ]; then
+    # remove the existing entry from the path if present
+    path=("${path[@]:#$1}")
+    # and now add it to the beginning
+    path=("$1" "$path[@]")
+  fi
+}
+
+prepend_to_path $HOME/go/bin
+prepend_to_path $HOME/.go/bin
+prepend_to_path $HOME/.cargo/bin
+prepend_to_path $HOME/bin
+prepend_to_path $HOME/.local/bin
+
+# make our prompt colorful
+prompt() {
+  case $1 in
+    on)
+      color_root=$(tput setaf 1)
+      color_user=$(tput setaf 2)
+      color_sudo=$(tput setaf 3)
+      color_reset=$(tput sgr0)
+
+      if (( EUID == 0 )); then
+        color=$color_root
+      elif [[ $SUDO_USER ]]; then
+        color=$color_sudo
+      else
+        color=$color_user
+      fi
+#      PROMPT_COMMAND="run_on_prompt_command"
+      PS1="%{$color%}%n@%m%{$color_reset%}:%~ \$ "
+      ;;
+
+    off)
+#      unset -v PROMPT_COMMAND
+      PS1='$ '
+      PS2='> '
+      PS3='? '
+      PS4='+ '
+      ;;
+  esac
+}
+
+prompt on
+
+# and if this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    autoload -Uz add-zsh-hook
+    _xterm_title () {print -Pn "\e]0;%n@%m: %~\a"}
+    add-zsh-hook precmd _xterm_title
+    ;;
+*)
+    ;;
+esac
+
+# colors!
+alias ls='ls --color=auto'
+if which dircolors > /dev/null 2>&1; then
+  eval $(dircolors)
+fi
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# emacs key bindings
+bindkey -e
+
+# load completion stuff
+autoload -Uz compinit
+compinit
+
+if command -v wezterm > /dev/null; then
+  eval "$(wezterm shell-completion --shell=zsh)"
+fi
+
+if command -v atuin > /dev/null; then
+  eval "$(atuin init zsh)"
+  eval "$(atuin gen-completions --shell zsh)"
+fi
+
+if command -v chezmoi > /dev/null; then
+  eval "$(chezmoi completion zsh)"
+fi
+
+function cj { curl -s -H "Accept: application/json" "$@" | jq -r '.'; }
