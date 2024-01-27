@@ -4,9 +4,14 @@ if [ -x /usr/bin/vim ]; then
 fi
 
 # configure regular history (in addition to atuin, if it is present)
-HISTFILE=~/.histfile
+HISTFILE=~/.zsh_history
 HISTSIZE=1000
 SAVEHIST=1000
+setopt HIST_IGNORE_ALL_DUPS  # do not put duplicated command into history list
+setopt HIST_SAVE_NO_DUPS  # do not save duplicated command
+setopt HIST_REDUCE_BLANKS  # remove unnecessary blanks
+setopt INC_APPEND_HISTORY_TIME  # append command to history file immediately after execution
+setopt EXTENDED_HISTORY  # record command start time
 
 # add some things to path if they exist, moving it to front if it does
 prepend_to_path () {
