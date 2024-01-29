@@ -28,4 +28,12 @@ return {
   keys = {
     { key = 't', mods = 'SUPER|SHIFT', action = wezterm.action.ShowLauncher },
   },
+
+  ssh_domains = {
+    {
+      name = 'plutus',
+      remote_address = 'plutus',
+      username = 'jimw',
+    },
+  },
 }
