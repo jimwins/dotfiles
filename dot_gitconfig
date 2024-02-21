@@ -4,5 +4,6 @@
 [alias]
 	ci = commit
 	st = status -s
+        staged = diff --staged
 [init]
 	defaultBranch = main
