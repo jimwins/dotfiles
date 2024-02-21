@@ -10,9 +10,9 @@ set expandtab
 " tabs are 8 spaces wide, anything else is madness
 set tabstop=8
 
-" but i prefer 2-space indents
-set shiftwidth=2
-set softtabstop=2
+" but i prefer 4-space indents (kind of. really prefer 2, php convention is 4 so whatever.)
+set shiftwidth=4
+set softtabstop=4
 
 " max text width on insert
 set tw=78
