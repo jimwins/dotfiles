@@ -24,6 +24,9 @@ set formatoptions=cqro1
 " turn on smart indenting
 set smartindent
 
+" let filetype control indenting
+filetype plugin indent on
+
 " always want the status line
 set laststatus=2
 
