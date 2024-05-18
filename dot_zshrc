@@ -85,6 +85,11 @@ alias egrep='egrep --color=auto'
 # emacs key bindings
 bindkey -e
 
+if test -d $HOME/.asdf; then
+  . $HOME/.asdf/asdf.sh
+  fpath=(${ASDF_DIR}/completions $fpath)
+fi
+
 # load completion stuff
 autoload -Uz compinit
 compinit
@@ -100,6 +105,10 @@ fi
 
 if command -v chezmoi > /dev/null; then
   eval "$(chezmoi completion zsh)"
+fi
+
+if test -x /usr/local/bin/brew; then
+  eval "$(/usr/local/bin/brew shellenv)"
 fi
 
 function cj { curl -s -H "Accept: application/json" "$@" | jq -r '.'; }
