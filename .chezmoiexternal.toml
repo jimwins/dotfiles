@@ -8,3 +8,16 @@
     type = "file"
     url = "https://raw.githubusercontent.com/rcaloras/bash-preexec/master/bash-preexec.sh"
     refreshPeriod = "168h"
+["Pictures/Wallpapers/flickr-472009316.jpg"]
+    type = "file"
+    url = "https://live.staticflickr.com/219/472009316_d5be91c710_o.jpg"
+[".fonts/source-code-pro"]
+    type = "archive"
+    url = "https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u%2F1.062R-i%2F1.026R-vf/TTF-source-code-pro-2.042R-u_1.062R-i.zip"
+    exact = true
+    stripComponents = 1
+[".config/herdr-app/fonts"]
+    type = "archive"
+    url = "https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u%2F1.062R-i%2F1.026R-vf/TTF-source-code-pro-2.042R-u_1.062R-i.zip"
+    exact = true
+    stripComponents = 1
