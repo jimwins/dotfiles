@@ -1,0 +1,21 @@
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=HangerSpace
+Exec=/home/jimw/.local/bin/chromium-pwa-launch HangerSpace inidglnklicoelfkckjnkepdpamabmde
+Icon=/home/jimw/.local/share/icons/hicolor/512x512/apps/chrome-inidglnklicoelfkckjnkepdpamabmde-Default.png
+StartupWMClass=crx_inidglnklicoelfkckjnkepdpamabmde
+Actions=Log-Today-s-Fit;Lookbook;My-Rack
+
+[Desktop Action Log-Today-s-Fit]
+Name=Log Today's Fit
+Exec=/home/jimw/.local/bin/chromium-pwa-launch HangerSpace inidglnklicoelfkckjnkepdpamabmde --app-launch-url-for-shortcuts-menu-item=https://my.hangerspace.app/
+
+[Desktop Action Lookbook]
+Name=Lookbook
+Exec=/home/jimw/.local/bin/chromium-pwa-launch HangerSpace inidglnklicoelfkckjnkepdpamabmde --app-launch-url-for-shortcuts-menu-item=https://my.hangerspace.app/lookbook/
+
+[Desktop Action My-Rack]
+Name=My Rack
+Exec=/home/jimw/.local/bin/chromium-pwa-launch HangerSpace inidglnklicoelfkckjnkepdpamabmde --app-launch-url-for-shortcuts-menu-item=https://my.hangerspace.app/rack/

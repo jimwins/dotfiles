@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+"""Launch a Chromium PWA and set its X11 WM_CLASS res_class to the app name so xfwm4's Alt+Tab shows the app name."""
+import ctypes
+import os
+import subprocess
+import sys
+import time
+
+if len(sys.argv) < 3:
+    sys.exit("Usage: chromium-pwa-launch <AppClassName> <app-id> [extra-chromium-args...]")
+
+app_class = sys.argv[1]
+app_id = sys.argv[2]
+extra_args = sys.argv[3:]
+target_res_name = f"crx_{app_id}"
+
+cmd = [
+    "/usr/lib/chromium/chromium",
+    "--profile-directory=Default",
+    f"--app-id={app_id}",
+] + extra_args
+
+proc = subprocess.Popen(cmd)
+
+x11 = ctypes.cdll.LoadLibrary("libX11.so.6")
+
+class XClassHint(ctypes.Structure):
+    _fields_ = [("res_name", ctypes.c_char_p), ("res_class", ctypes.c_char_p)]
+
+class XClientMessageEvent(ctypes.Structure):
+    _fields_ = [
+        ("type", ctypes.c_int),
+        ("serial", ctypes.c_ulong),
+        ("send_event", ctypes.c_int),
+        ("display", ctypes.c_void_p),
+        ("window", ctypes.c_ulong),
+        ("message_type", ctypes.c_ulong),
+        ("format", ctypes.c_int),
+        ("data", ctypes.c_long * 5),
+        ("pad", ctypes.c_long * 15),
+    ]
+
+x11.XOpenDisplay.argtypes = [ctypes.c_char_p]
+x11.XOpenDisplay.restype = ctypes.c_void_p
+x11.XDefaultRootWindow.argtypes = [ctypes.c_void_p]
+x11.XDefaultRootWindow.restype = ctypes.c_ulong
+x11.XDefaultScreen.argtypes = [ctypes.c_void_p]
+x11.XDefaultScreen.restype = ctypes.c_int
+x11.XInternAtom.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+x11.XInternAtom.restype = ctypes.c_ulong
+x11.XGetWindowProperty.argtypes = [
+    ctypes.c_void_p, ctypes.c_ulong, ctypes.c_ulong,
+    ctypes.c_long, ctypes.c_long, ctypes.c_int, ctypes.c_ulong,
+    ctypes.POINTER(ctypes.c_ulong), ctypes.POINTER(ctypes.c_int),
+    ctypes.POINTER(ctypes.c_ulong), ctypes.POINTER(ctypes.c_ulong),
+    ctypes.POINTER(ctypes.POINTER(ctypes.c_ulong)),
+]
+x11.XGetWindowProperty.restype = ctypes.c_int
+x11.XGetClassHint.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.POINTER(XClassHint)]
+x11.XGetClassHint.restype = ctypes.c_int
+x11.XSetClassHint.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.POINTER(XClassHint)]
+x11.XSetClassHint.restype = ctypes.c_int
+x11.XWithdrawWindow.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int]
+x11.XWithdrawWindow.restype = ctypes.c_int
+x11.XMapWindow.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
+x11.XMapWindow.restype = ctypes.c_int
+x11.XSendEvent.argtypes = [ctypes.c_void_p, ctypes.c_ulong, ctypes.c_int, ctypes.c_long, ctypes.c_void_p]
+x11.XSendEvent.restype = ctypes.c_int
+x11.XSync.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+dpy = x11.XOpenDisplay(None)
+if not dpy:
+    sys.exit(0)
+
+root = x11.XDefaultRootWindow(dpy)
+screen = x11.XDefaultScreen(dpy)
+net_client_list = x11.XInternAtom(dpy, b"_NET_CLIENT_LIST", 0)
+net_wm_state = x11.XInternAtom(dpy, b"_NET_WM_STATE", 0)
+xa_window = 33
+xa_atom = 4
+
+def get_ulong_prop(win, atom, req_type):
+    actual_type = ctypes.c_ulong()
+    actual_format = ctypes.c_int()
+    nitems = ctypes.c_ulong()
+    bytes_after = ctypes.c_ulong()
+    prop = ctypes.POINTER(ctypes.c_ulong)()
+    status = x11.XGetWindowProperty(
+        dpy, win, atom, 0, 1024, 0, req_type,
+        ctypes.byref(actual_type), ctypes.byref(actual_format),
+        ctypes.byref(nitems), ctypes.byref(bytes_after), ctypes.byref(prop)
+    )
+    if status != 0 or not prop:
+        return []
+    return [prop[i] for i in range(nitems.value)]
+
+deadline = time.time() + 10.0
+while time.time() < deadline:
+    found = False
+    for wid in get_ulong_prop(root, net_client_list, xa_window):
+        ch = XClassHint()
+        if x11.XGetClassHint(dpy, wid, ctypes.byref(ch)):
+            rname = ch.res_name.decode("utf-8", "replace") if ch.res_name else ""
+            rclass = ch.res_class.decode("utf-8", "replace") if ch.res_class else ""
+            if rname == target_res_name:
+                found = True
+                if rclass != app_class:
+                    saved_states = get_ulong_prop(wid, net_wm_state, xa_atom)
+                    new_ch = XClassHint(rname.encode("utf-8"), app_class.encode("utf-8"))
+                    x11.XSetClassHint(dpy, wid, ctypes.byref(new_ch))
+                    x11.XWithdrawWindow(dpy, wid, screen)
+                    x11.XSync(dpy, 0)
+                    time.sleep(0.05)
+                    x11.XMapWindow(dpy, wid)
+                    x11.XSync(dpy, 0)
+                    for st in saved_states:
+                        ev = XClientMessageEvent()
+                        ev.type = 33  # ClientMessage
+                        ev.window = wid
+                        ev.message_type = net_wm_state
+                        ev.format = 32
+                        ev.data[0] = 1  # _NET_WM_STATE_ADD
+                        ev.data[1] = st
+                        ev.data[3] = 1
+                        x11.XSendEvent(dpy, root, 0, (1 << 20) | (1 << 19), ctypes.byref(ev))
+                    x11.XSync(dpy, 0)
+                break
+    if found:
+        break
+    time.sleep(0.1)
