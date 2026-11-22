@@ -82,6 +82,11 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
+if ! command -v pbcopy > /dev/null 2>&1 && command -v xsel > /dev/null 2>&1; then
+  alias pbcopy='xsel --clipboard --input'
+  alias pbpaste='xsel --clipboard --output'
+fi
+
 # emacs key bindings
 bindkey -e
 

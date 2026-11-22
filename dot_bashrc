@@ -65,6 +65,11 @@ fi
 
 alias grep='grep --color=auto'
 
+if ! which pbcopy > /dev/null 2>&1 && which xsel > /dev/null 2>&1; then
+  alias pbcopy='xsel --clipboard --input'
+  alias pbpaste='xsel --clipboard --output'
+fi
+
 function cj { curl -s -H "Accept: application/json" "$@" | jq -r '.'; }
 
 if which wezterm > /dev/null 2>&1; then
