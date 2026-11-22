@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=caBLE UHID Bridge
+Comment=FIDO2 Virtual USB Passkey Token caBLE Bridge
+Exec=/home/jimw/.local/bin/cable-uhid-bridge
+Terminal=false
+Hidden=false
+X-GNOME-Autostart-enabled=true
